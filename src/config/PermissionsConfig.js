@@ -2,7 +2,7 @@ import {PermissionsAndroid} from 'react-native';
 
 const PermissionsConfig = async () => {
     const grantedStorage = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,  // 갤러리 접근
         {
             title: "title",
             message: "message",
