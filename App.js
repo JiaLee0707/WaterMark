@@ -35,6 +35,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
+import {DragTextEditor} from "react-native-drag-text-editor";
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -106,6 +107,22 @@ const App: () => Node = () => {
     });
   }
 
+  const viewComponent = () => <View style={styles.cornerStyles}/>;
+
+  const _cornerComponent = [
+    {
+      side: 'TR',
+      customCornerComponent: () => viewComponent()
+    },
+  ];
+
+  const _rotateComponent = {
+    side: 'bottom',
+    customRotationComponent: () => viewComponent()
+  };
+
+  const _resizerSnapPoints = ['right', 'left'];
+
   return (
     <SafeAreaView style={[backgroundStyle, styles.Screen]}>
       <StatusBar
@@ -128,9 +145,18 @@ const App: () => Node = () => {
             },
           ]}></View>
         <PanGestureHandler onGestureEvent={panGestureEvent}>
-          <Animated.View
-              style={[styles.square, { height: 100, width: 100 }, rStyle]}
+
+          <DragTextEditor
+              visible={true}
+              resizerSnapPoints={_resizerSnapPoints}
+              cornerComponents={_cornerComponent}
+              rotationComponent={_rotateComponent}
+              externalTextStyles={styles.textStyles}
+              externalBorderStyles={styles.borderStyles}
           />
+          {/*<Animated.View*/}
+          {/*    style={[styles.square, { height: 100, width: 100 }, rStyle]}*/}
+          {/*/>*/}
         </PanGestureHandler>
         {/*<ViewShot ref={viewShotRef} style={{flex: 2}}>*/}
         {/*  <Img source={{uri:photo}} resizeMode="contain"/>*/}
@@ -182,6 +208,17 @@ const styles = StyleSheet.create({
   square: {
     borderRadius: 15,
     backgroundColor: 'red',
+  },
+  cornerStyles: {
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    borderColor: '#aaa',
+  },
+  borderStyles: {
+    borderStyle: 'dashed',
+    borderColor: 'gray',
   },
 });
 
