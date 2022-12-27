@@ -9,7 +9,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import type {Node} from 'react';
 import {
-  Button,
+  Button, Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
@@ -23,9 +23,10 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import PermissionsConfig from "./src/config/PermissionsConfig";
-import {launchImageLibrary} from "react-native-image-picker";
-import ViewShot from "react-native-view-shot";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import {launchImageLibrary} from "react-native-image-picker"; // 이미지 불러오기
+import ViewShot from "react-native-view-shot";  // 이미지 캡쳐
+import { CameraRoll } from "@react-native-camera-roll/camera-roll"; // 이미지 저장
+import {DragTextEditor} from 'react-native-drag-text-editor'; // 텍스트
 
 import {Btn, Img} from "./src/view/styled/TestStyled";
 import {PanGestureHandler, GestureHandlerRootView} from "react-native-gesture-handler";
@@ -36,6 +37,8 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
+const WINDOW = Dimensions.get("window");
+
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -44,6 +47,14 @@ const App: () => Node = () => {
   };
 
   const [photo, setPhoto] = useState(null);
+  const ID = {
+    defTextID: 1,
+    defTextValue: 1,
+    defAlign: "center",
+    defLetterSpacing: 0,
+    defColor: "#000000",
+    defFontSize: 15,
+  }
 
   const viewShotRef = useRef(null);
 
@@ -106,6 +117,22 @@ const App: () => Node = () => {
     });
   }
 
+  const viewComponent = () => <View style={styles.cornerStyles}/>;
+
+  const _cornerComponent = [
+    {
+      side: 'TR',
+      customCornerComponent: () => viewComponent()
+    },
+  ];
+
+  const _rotateComponent = {
+    side: 'bottom',
+    customRotationComponent: () => viewComponent()
+  };
+
+  const _resizerSnapPoints = ['right', 'left'];
+
   return (
     <SafeAreaView style={[backgroundStyle, styles.Screen]}>
       <StatusBar
@@ -114,20 +141,57 @@ const App: () => Node = () => {
       />
       <GestureHandlerRootView
           style={styles.Screen}
-        // contentInsetAdjustmentBehavior="automatic"
-        >
+          // contentInsetAdjustmentBehavior="automatic"
+      >
 
-      <View
-          style={[
-            styles.dropzone,
-            {
-              top: 0,
-              height: 200,
-              width: '100%',
-              position: 'absolute',
-            },
-          ]}></View>
+        <View
+            style={[
+              styles.dropzone,
+              {
+                top: 0,
+                height: 200,
+                width: '100%',
+                position: 'absolute',
+              },
+            ]}></View>
         <PanGestureHandler onGestureEvent={panGestureEvent}>
+          <DragTextEditor
+              style={{flex: 2, width: '100%'}}
+
+              visible={true}
+              isDraggable={true}
+              isResizable={true}
+              resizerSnapPoints={_resizerSnapPoints}
+              cornerComponents={_cornerComponent}
+              rotationComponent={_rotateComponent}
+              externalTextStyles={styles.textStyles}
+              externalBorderStyles={styles.borderStyles}
+              onResizeStart={() => console.log('aaa')}
+          />
+          <DragTextEditor
+              minWidth={100}
+              minHeight={100}
+              w={200}
+              h={200}
+              x={WINDOW.width / 4}
+              y={WINDOW.height / 3}
+              FontColor={ID.defColor}
+              TextAlign={ID.defAlign}
+              LetterSpacing={ID.defLetterSpacing}
+              FontSize={ID.defFontSize}
+              // TopRightAction={() => this.removeText(ID.defTextID)}
+              centerPress={() => console.log('eeee')}
+              onItemActive={(e) => console.log('eeee', e)}
+              isDraggable={true}
+              isResizable={true}
+              resizerSnapPoints={_resizerSnapPoints}
+              onDragStart={() => console.log("-Drag Started")}
+              onDragEnd={() => console.log("- Drag ended")}
+              onDrag={() => console.log("- Dragging...")}
+              onResizeStart={() => console.log("- Resize Started")}
+              onResize={() => console.log("- Resizing...")}
+              onResizeEnd={() => console.log("- Resize Ended")}
+          />
           <Animated.View
               style={[styles.square, { height: 100, width: 100 }, rStyle]}
           />
@@ -182,6 +246,20 @@ const styles = StyleSheet.create({
   square: {
     borderRadius: 15,
     backgroundColor: 'red',
+  },
+  borderStyles: {
+    borderStyle: 'dashed',
+    borderColor: 'gray',
+  },
+  textStyles: {
+    color: '#000',
+  },
+  cornerStyles: {
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    borderColor: '#aaa',
   },
 });
 

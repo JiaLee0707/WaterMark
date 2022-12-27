@@ -1,6 +1,10 @@
 import React from 'react';
 import styled from 'styled-components/native';
 
+export const Screen = styled.View`
+    
+`;
+
 export const Img = styled.Image`
   //display: flex;
   //flex-grow: 1;
