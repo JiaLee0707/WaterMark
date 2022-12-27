@@ -15,7 +15,7 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet, Text,
-  useColorScheme, View,
+  useColorScheme, View, TextInput
 } from 'react-native';
 
 import {
@@ -27,7 +27,6 @@ import {launchImageLibrary} from "react-native-image-picker";
 import ViewShot from "react-native-view-shot";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
-import {Btn, Img} from "./src/view/styled/TestStyled";
 import {PanGestureHandler, GestureHandlerRootView} from "react-native-gesture-handler";
 import Animated, {
   useAnimatedGestureHandler,
@@ -35,6 +34,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
+import {Btn, Img} from "./src/view/styled/TestStyled";
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -60,13 +60,13 @@ const App: () => Node = () => {
       translateX.value = event.translationX + context.translateX;
       translateY.value = event.translationY + context.translateY;
     },
-    onEnd: (event, context) => {
-      if (event.absoluteY> 150) {
-        // withSpring animation our moveable box will move originial coordinate more user friendly.
-        translateX.value = withSpring(0);
-        translateY.value = withSpring(0);
-      }
-    },
+    // onEnd: (event, context) => {
+    //   if (event.absoluteY> 150) {
+    //     // withSpring animation our moveable box will move originial coordinate more user friendly.
+    //     translateX.value = withSpring(0);
+    //     translateY.value = withSpring(0);
+    //   }
+    // },
   });
   // When shared value changes. animated style update the values accordingly that.
   const rStyle = useAnimatedStyle(() => {
@@ -91,6 +91,7 @@ const App: () => Node = () => {
     if (result.didCancel){
       return null;
     }
+    console.log('result', result.didCancel);
     const localUri = result.assets[0].uri;
     const uriPath = localUri.split("//").pop();
     const imageName = localUri.split("/").pop();
@@ -117,32 +118,35 @@ const App: () => Node = () => {
         // contentInsetAdjustmentBehavior="automatic"
         >
 
-      <View
-          style={[
-            styles.dropzone,
-            {
-              top: 0,
-              height: 200,
-              width: '100%',
-              position: 'absolute',
-            },
-          ]}></View>
-        <PanGestureHandler onGestureEvent={panGestureEvent}>
-          <Animated.View
-              style={[styles.square, { height: 100, width: 100 }, rStyle]}
-          />
-        </PanGestureHandler>
-        {/*<ViewShot ref={viewShotRef} style={{flex: 2}}>*/}
-        {/*  <Img source={{uri:photo}} resizeMode="contain"/>*/}
-        {/*  /!*<PanGestureHandler onGestureEvent={panGestureEvent}>*!/*/}
-        {/*    /!*<Animated.View*!/*/}
-        {/*    /!*    style={[styles.square, { height: 100, width: 100 }, rStyle]}*!/*/}
-        {/*    /!*//*/}
-        {/*  /!*</PanGestureHandler>*!/*/}
-        {/*</ViewShot>*/}
-        {/*<Btn title="이미지 선택" onPress={showPicker} style={{flex: 1}}></Btn>*/}
-        {/*<Btn title="텍스트 추가" onPress={showPicker} style={{flex: 1}}></Btn>*/}
-        {/*<Btn title="저장?" onPress={save} 스타일={{flex: 1}}></Btn>*/}
+      {/*<View*/}
+      {/*    style={[*/}
+      {/*      styles.dropzone,*/}
+      {/*      {*/}
+      {/*        top: 0,*/}
+      {/*        height: 200,*/}
+      {/*        width: '100%',*/}
+      {/*        position: 'absolute',*/}
+      {/*      },*/}
+      {/*    ]}></View>*/}
+        <ViewShot ref={viewShotRef} style={{flex: 2}}>
+          <Img source={{uri:photo}} resizeMode="contain"/>
+          {/*<PanGestureHandler onGestureEvent={panGestureEvent} style={{position: "relative", backgroundColor: '#000000'}}>*/}
+          {/*  <Animated.View*/}
+          {/*      style={[styles.square, { height: 100, width: 100 }, rStyle]}*/}
+          {/*  >*/}
+          {/*    <TextInput style={{ height: 50, width: 50, backgroundColor: 'white' }} />*/}
+          {/*  </Animated.View>*/}
+          {/*  /!*<TextInput />*!/*/}
+          {/*</PanGestureHandler>*/}
+          {/*<PanGestureHandler onGestureEvent={panGestureEvent}>*/}
+            {/*<Animated.View*/}
+            {/*    style={[styles.square, { height: 100, width: 100 }, rStyle]}*/}
+            {/*//
+          {/*</PanGestureHandler>*/}
+        </ViewShot>
+        <Btn title="이미지 선택" onPress={showPicker}></Btn>
+        <Btn title="텍스트 추가" onPress={showPicker}></Btn>
+        <Btn title="저장?" onPress={save}></Btn>
       </GestureHandlerRootView>
     </SafeAreaView>
   );
@@ -152,6 +156,8 @@ const styles = StyleSheet.create({
   Screen: {
     // display: "flex",
     flex: 1,
+    width: '100%',
+    height: '100%',
     alignItems: "center",
     justifyContent: "center",
     // backgroundColor: "#000000",
@@ -177,11 +183,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   dropzone: {
-    backgroundColor: 'rgba(0, 0, 256, 0.5)',
+    backgroundColor: 'rgb(153,187,255)',
   },
   square: {
     borderRadius: 15,
-    backgroundColor: 'red',
+    backgroundColor: "#99BBFFFF",
   },
 });
 

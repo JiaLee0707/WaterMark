@@ -11,7 +11,7 @@ export const Img = styled.Image`
 `;
 
 export const Btn = styled.Button`
-  //display: flex;
+  display: flex;
   //flex-grow: 4;
   background-color: rebeccapurple;
   width: 100%;
