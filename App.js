@@ -101,7 +101,10 @@ const App: () => Node = () => {
   const save = () => {
     viewShotRef.current.capture().then((url) => {
       console.log('url', url);
-      CameraRoll.saveToCameraRoll(url).then(r => {
+      // CameraRoll.saveToCameraRoll(url).then(r => {
+      //   console.log('🐤result', r);
+      // });
+      CameraRoll.save(url, "photo").then(r => {
         console.log('🐤result', r);
       });
     });
@@ -128,21 +131,15 @@ const App: () => Node = () => {
       {/*        position: 'absolute',*/}
       {/*      },*/}
       {/*    ]}></View>*/}
-        <ViewShot ref={viewShotRef} style={{flex: 2}}>
+        <ViewShot ref={viewShotRef} style={{flex: 2, width: '100%'}}>
           <Img source={{uri:photo}} resizeMode="contain"/>
-          {/*<PanGestureHandler onGestureEvent={panGestureEvent} style={{position: "relative", backgroundColor: '#000000'}}>*/}
-          {/*  <Animated.View*/}
-          {/*      style={[styles.square, { height: 100, width: 100 }, rStyle]}*/}
-          {/*  >*/}
-          {/*    <TextInput style={{ height: 50, width: 50, backgroundColor: 'white' }} />*/}
-          {/*  </Animated.View>*/}
-          {/*  /!*<TextInput />*!/*/}
-          {/*</PanGestureHandler>*/}
-          {/*<PanGestureHandler onGestureEvent={panGestureEvent}>*/}
-            {/*<Animated.View*/}
-            {/*    style={[styles.square, { height: 100, width: 100 }, rStyle]}*/}
-            {/*//
-          {/*</PanGestureHandler>*/}
+          <PanGestureHandler onGestureEvent={panGestureEvent} style={{position: "relative", backgroundColor: '#000000'}}>
+            <Animated.View
+                style={[styles.square, { height: 100, width: 100 }, rStyle]}
+            >
+              <TextInput style={{ height: 50, width: 50, backgroundColor: 'white' }} />
+            </Animated.View>
+          </PanGestureHandler>
         </ViewShot>
         <Btn title="이미지 선택" onPress={showPicker}></Btn>
         <Btn title="텍스트 추가" onPress={showPicker}></Btn>
