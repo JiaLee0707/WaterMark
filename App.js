@@ -27,7 +27,7 @@ import {launchImageLibrary} from "react-native-image-picker";
 import ViewShot from "react-native-view-shot";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
-import {PanGestureHandler, GestureHandlerRootView} from "react-native-gesture-handler";
+import {PanGestureHandler, PinchGestureHandler, GestureHandlerRootView} from "react-native-gesture-handler";
 import Animated, {
   useAnimatedGestureHandler,
   useSharedValue,
@@ -47,27 +47,35 @@ const App: () => Node = () => {
 
   const viewShotRef = useRef(null);
 
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+  // const translateX = useSharedValue(0);
+  // const translateY = useSharedValue(0);
+  const translateX = useSharedValue(21.88224220275879);
+  const translateY = useSharedValue(-300.57316064834595);
+  const width = useSharedValue(1);
+  const height = useSharedValue(100);
 
   const panGestureEvent = useAnimatedGestureHandler({
     onStart: (event, context) => {
-      console.log('onStart');
       context.translateX = translateX.value;
       context.translateY = translateY.value;
+      console.log('translateX.value', translateX.value);
+      console.log('translateY.value', translateY.value);
     },
     onActive: (event, context) => {
       translateX.value = event.translationX + context.translateX;
       translateY.value = event.translationY + context.translateY;
+
+      if (event.numberOfPointers > 1) {
+
+      }
     },
-    // onEnd: (event, context) => {
-    //   if (event.absoluteY> 150) {
-    //     // withSpring animation our moveable box will move originial coordinate more user friendly.
-    //     translateX.value = withSpring(0);
-    //     translateY.value = withSpring(0);
-    //   }
-    // },
-  });
+  },{ useNativeDriver: true });
+  const pinchGestureEvent = useAnimatedGestureHandler({
+    onActive: (event, context) => {
+      width.value = event.scale;
+    },
+  },{ useNativeDriver: true });
+
   // When shared value changes. animated style update the values accordingly that.
   const rStyle = useAnimatedStyle(() => {
     return {
@@ -78,6 +86,9 @@ const App: () => Node = () => {
         {
           translateY: translateY.value,
         },
+        {
+          scale: width?.value,
+        }
       ],
     };
   });
@@ -132,12 +143,23 @@ const App: () => Node = () => {
       {/*      },*/}
       {/*    ]}></View>*/}
         <ViewShot ref={viewShotRef} style={{flex: 2, width: '100%'}}>
-          <Img source={{uri:photo}} resizeMode="contain"/>
-          <PanGestureHandler onGestureEvent={panGestureEvent} style={{position: "relative", backgroundColor: '#000000'}}>
-            <Animated.View
-                style={[styles.square, { height: 100, width: 100 }, rStyle]}
-            >
-              <TextInput style={{ height: 50, width: 50, backgroundColor: 'white' }} />
+          <Img source={{uri:photo}} resizeMode="contain" />
+          <PanGestureHandler
+              onGestureEvent={panGestureEvent}
+              // minPointers={2}
+              // onHandlerStateChange={_onPinchHandlerStateChange}>
+              style={{position: "relative", backgroundColor: '#000000'}}
+          >
+            <Animated.View>
+              <PinchGestureHandler
+                  onGestureEvent={pinchGestureEvent}
+              >
+                <Animated.View
+                    style={[styles.square, rStyle]}
+                >
+                  <TextInput style={{ height: 50, width: 50, backgroundColor: 'white' }} />
+                </Animated.View>
+              </PinchGestureHandler>
             </Animated.View>
           </PanGestureHandler>
         </ViewShot>
