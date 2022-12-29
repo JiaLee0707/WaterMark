@@ -51,50 +51,44 @@ const App: () => Node = () => {
 
   const viewShotRef = useRef(null);
 
+  const context = useSharedValue({x: 0, y: 0});
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
-  // const translateX = useSharedValue(21.88224220275879);
-  // const translateY = useSharedValue(-300.57316064834595);
   const scale = useSharedValue(1);
+  // const width = useSharedValue(100);
 
   const panGesture = Gesture.Pan()
-      .onUpdate(e => {
-        translateX.value = e.translationX;
-        translateY.value = e.translationY;
+      .onBegin((event) => {
+        context.value = {x: translateX.value, y: translateY.value};
       })
-      // .onEnd(e => {
-      //   translateX.value = withTiming(e.translationX);
-      //   translateY.value = withTiming(e.translationY);
-      // });
-  // panGesture.enableTrackpadTwoFingerGesture(true)
-
-  const pinchGesture = Gesture.Pinch()
-      .onBegin(e => {
-        // runOnJS(props.onPinchImage)(props.postActivityId)
-      })
-      .onUpdate((e) => {
-        scale.value = e.scale
-      })
-      .onEnd(() => {
-        scale.value = withTiming(1)
+      .onUpdate((event) => {
+        translateX.value = event.translationX + context.value.x;
+        translateY.value = event.translationY + context.value.y;
       });
 
+  panGesture.enableTrackpadTwoFingerGesture(true)
+
+  const pinchGesture = Gesture.Pinch()
+      // .onBegin(e => {
+      //   // runOnJS(props.onPinchImage)(props.postActivityId)
+      // })
+      .onUpdate((event) => {
+        scale.value = event.scale
+      })
+      // .onEnd(() => {
+      //   scale.value = withTiming(1)
+      // });
 
   const composed = Gesture.Simultaneous(panGesture, pinchGesture);
 
   // When shared value changes. animated style update the values accordingly that.
   const rStyle = useAnimatedStyle(() => {
     return {
+      width: width?.value,
       transform: [
-        {
-          translateX: translateX.value,
-        },
-        {
-          translateY: translateY.value,
-        },
-        {
-          scale: scale?.value,
-        }
+        {translateX: translateX?.value},
+        {translateY: translateY?.value},
+        {scale: scale?.value}
       ],
     };
   });
