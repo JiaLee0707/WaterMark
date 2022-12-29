@@ -27,12 +27,16 @@ import {launchImageLibrary} from "react-native-image-picker";
 import ViewShot from "react-native-view-shot";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
-import {PanGestureHandler, PinchGestureHandler, GestureHandlerRootView} from "react-native-gesture-handler";
+import {
+  Gesture,
+  GestureHandlerRootView,
+  GestureDetector
+} from "react-native-gesture-handler";
 import Animated, {
   useAnimatedGestureHandler,
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 import {Btn, Img} from "./src/view/styled/TestStyled";
 
@@ -47,34 +51,36 @@ const App: () => Node = () => {
 
   const viewShotRef = useRef(null);
 
-  // const translateX = useSharedValue(0);
-  // const translateY = useSharedValue(0);
-  const translateX = useSharedValue(21.88224220275879);
-  const translateY = useSharedValue(-300.57316064834595);
-  const width = useSharedValue(1);
-  const height = useSharedValue(100);
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  // const translateX = useSharedValue(21.88224220275879);
+  // const translateY = useSharedValue(-300.57316064834595);
+  const scale = useSharedValue(1);
 
-  const panGestureEvent = useAnimatedGestureHandler({
-    onStart: (event, context) => {
-      context.translateX = translateX.value;
-      context.translateY = translateY.value;
-      console.log('translateX.value', translateX.value);
-      console.log('translateY.value', translateY.value);
-    },
-    onActive: (event, context) => {
-      translateX.value = event.translationX + context.translateX;
-      translateY.value = event.translationY + context.translateY;
+  const panGesture = Gesture.Pan()
+      .onUpdate(e => {
+        translateX.value = e.translationX;
+        translateY.value = e.translationY;
+      })
+      // .onEnd(e => {
+      //   translateX.value = withTiming(e.translationX);
+      //   translateY.value = withTiming(e.translationY);
+      // });
+  // panGesture.enableTrackpadTwoFingerGesture(true)
 
-      if (event.numberOfPointers > 1) {
+  const pinchGesture = Gesture.Pinch()
+      .onBegin(e => {
+        // runOnJS(props.onPinchImage)(props.postActivityId)
+      })
+      .onUpdate((e) => {
+        scale.value = e.scale
+      })
+      .onEnd(() => {
+        scale.value = withTiming(1)
+      });
 
-      }
-    },
-  },{ useNativeDriver: true });
-  const pinchGestureEvent = useAnimatedGestureHandler({
-    onActive: (event, context) => {
-      width.value = event.scale;
-    },
-  },{ useNativeDriver: true });
+
+  const composed = Gesture.Simultaneous(panGesture, pinchGesture);
 
   // When shared value changes. animated style update the values accordingly that.
   const rStyle = useAnimatedStyle(() => {
@@ -87,7 +93,7 @@ const App: () => Node = () => {
           translateY: translateY.value,
         },
         {
-          scale: width?.value,
+          scale: scale?.value,
         }
       ],
     };
@@ -127,42 +133,20 @@ const App: () => Node = () => {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <GestureHandlerRootView
-          style={styles.Screen}
-        // contentInsetAdjustmentBehavior="automatic"
-        >
-
-      {/*<View*/}
-      {/*    style={[*/}
-      {/*      styles.dropzone,*/}
-      {/*      {*/}
-      {/*        top: 0,*/}
-      {/*        height: 200,*/}
-      {/*        width: '100%',*/}
-      {/*        position: 'absolute',*/}
-      {/*      },*/}
-      {/*    ]}></View>*/}
-        <ViewShot ref={viewShotRef} style={{flex: 2, width: '100%'}}>
-          <Img source={{uri:photo}} resizeMode="contain" />
-          <PanGestureHandler
-              onGestureEvent={panGestureEvent}
-              // minPointers={2}
-              // onHandlerStateChange={_onPinchHandlerStateChange}>
-              style={{position: "relative", backgroundColor: '#000000'}}
-          >
-            <Animated.View>
-              <PinchGestureHandler
-                  onGestureEvent={pinchGestureEvent}
-              >
-                <Animated.View
-                    style={[styles.square, rStyle]}
-                >
-                  <TextInput style={{ height: 50, width: 50, backgroundColor: 'white' }} />
-                </Animated.View>
-              </PinchGestureHandler>
+      <GestureHandlerRootView style={styles.Screen}>
+        <GestureDetector gesture={composed}>
+          <ViewShot ref={viewShotRef} style={{position: 'relative', flex: 2, width: '100%',
+            // alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: '#000000'}}>
+            <Img source={{uri:photo}} resizeMode="contain" />
+            <Animated.View
+                style={[styles.square, rStyle]}
+            >
+              <TextInput style={{ height: 50, width: 50, backgroundColor: 'white' }} />
             </Animated.View>
-          </PanGestureHandler>
-        </ViewShot>
+          </ViewShot>
+        </GestureDetector>
         <Btn title="이미지 선택" onPress={showPicker}></Btn>
         <Btn title="텍스트 추가" onPress={showPicker}></Btn>
         <Btn title="저장?" onPress={save}></Btn>
