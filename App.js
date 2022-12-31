@@ -30,8 +30,8 @@ import {
     GestureHandlerRootView,
     GestureDetector,
 } from "react-native-gesture-handler";
-import Animated, {
-    useAnimatedStyle, useDerivedValue,
+import {
+    useAnimatedStyle,
     useSharedValue,
 } from 'react-native-reanimated';
 import {Btn, Img} from "./src/view/styled/TestStyled";
@@ -54,23 +54,18 @@ const App: () => Node = () => {
     const scale = useSharedValue(1);
 
     const panGesture = Gesture.Pan()
-        .onFinalize((event) => console.log('onFinalize'))
         .onBegin((event) => {
-            console.log('onStart', event);
             context.value = {x: translateX.value, y: translateY.value};
-            // if (event.state === 2) State.ACTIVE();
         })
         .onUpdate((event) => {
             console.log('onUpdate', event);
             translateX.value = event.translationX + context.value.x;
             translateY.value = event.translationY + context.value.y;
-        });
-
-    panGesture.enableTrackpadTwoFingerGesture(true)
+        })
+        .enableTrackpadTwoFingerGesture(true);
 
     const pinchGesture = Gesture.Pinch()
         .onUpdate((event) => {
-            console.log('onUpdate Pinch', event);
             scale.value = event.scale
         });
 
@@ -94,7 +89,7 @@ const App: () => Node = () => {
         const result = await launchImageLibrary();
         if (result.didCancel) return null;
 
-        console.log('result', result.didCancel);
+        // console.log('result', result.didCancel);
         const localUri = result.assets[0].uri;
         const uriPath = localUri.split("//").pop();
         // const imageName = localUri.split("/").pop();
@@ -103,9 +98,9 @@ const App: () => Node = () => {
 
     const save = () => {
         viewShotRef.current.capture().then((url) => {
-            console.log('url', url);
+            // console.log('url', url);
             CameraRoll.save(url, "photo").then(r => {
-                console.log('🐤result', r);
+                // console.log('🐤result', r);
             });
         });
     }
@@ -118,14 +113,18 @@ const App: () => Node = () => {
             />
             <GestureHandlerRootView style={styles.Screen}>
                 <GestureDetector gesture={composed}>
-                    <ViewShot ref={viewShotRef} style={{
-                        position: 'relative', flex: 2, width: '100%',
-                        alignItems: "center",
-                        justifyContent: "center",
-                        // backgroundColor: '#000000'
-                    }}>
+                    <ViewShot
+                        ref={viewShotRef}
+                        style={{
+                            position: 'relative',
+                            flex: 2,
+                            width: '100%',
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
                         <Img source={{uri: photo}} resizeMode="contain"/>
-                        <DragTextEditorPresenter animatedStyle={animatedStyle} />
+                        <DragTextEditorPresenter animatedStyle={animatedStyle}/>
                     </ViewShot>
                 </GestureDetector>
                 <Btn title="이미지 선택" onPress={showPicker}></Btn>
@@ -144,34 +143,6 @@ const styles = StyleSheet.create({
         height: '100%',
         alignItems: "center",
         justifyContent: "center",
-        // backgroundColor: "#000000",
-    },
-    img: {
-        width: '100%',
-        height: '100%',
-    },
-    sectionContainer: {
-        marginTop: 32,
-        paddingHorizontal: 24,
-    },
-    sectionTitle: {
-        fontSize: 24,
-        fontWeight: '600',
-    },
-    sectionDescription: {
-        marginTop: 8,
-        fontSize: 18,
-        fontWeight: '400',
-    },
-    highlight: {
-        fontWeight: '700',
-    },
-    dropzone: {
-        backgroundColor: 'rgb(153,187,255)',
-    },
-    square: {
-        borderRadius: 15,
-        backgroundColor: "#99BBFFFF",
     },
 });
 
